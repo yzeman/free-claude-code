@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from loguru import logger
 from starlette.exceptions import HTTPException
+from starlette.middleware.cors import CORSMiddleware
 
 from free_claude_code.application.code_sessions import (
     CodeConflictError,
@@ -56,6 +57,13 @@ def create_app(services: ApiServices) -> FastAPI:
     app.add_middleware(ClientRequestLifetimeMiddleware)
     app.add_middleware(RequestOutcomeMiddleware)
     app.add_middleware(RequestCorrelationMiddleware)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["https://hoppscotch.io"],
+        allow_credentials=False,
+        allow_methods=["POST", "OPTIONS"],
+        allow_headers=["x-api-key", "anthropic-version", "content-type", "authorization"],
+    )
 
     app.include_router(admin_router)
     app.include_router(code_router)
